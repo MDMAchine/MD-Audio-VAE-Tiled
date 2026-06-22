@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MD-Audio-VAE-Tiled"
+version = "3.0.1"
+description = "Enterprise OLA synthesis engine for infinite-duration audio VAE decoding. BPM-synced tiling, dual-pass seam cancellation, spectral cleanup chain."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "Alexander Allan (MDMAchine)", email = "aallan@aeconcepts.net" },
+]
+keywords = ["diffusion", "comfyui", "audio", "ace-step", "vae", "oobleck", "tiling", "overlap-add"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+
+dependencies = [
+    "torch>=2.0.0",
+    "numpy>=1.24.0",
+]
+
+[project.optional-dependencies]
+full = [
+    "scipy>=1.10.0",
+    "pyyaml>=6.0",
+    "matplotlib>=3.7.0",
+    "Pillow>=9.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/MDMAchine/MD-Audio-VAE-Tiled"
+Issues = "https://github.com/MDMAchine/MD-Audio-VAE-Tiled/issues"
+HuggingFace = "https://huggingface.co/mdmachine/ACEStep-XL-Regrind-V1"

@@ -1,0 +1,135 @@
+<svg width="100%" viewBox="0 0 690 350" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>MD Audio VAE Tiled &#x2014; Long-Audio VAE Decoder &#x2014; MDMAchine / A&amp;E Concepts</title>
+<desc>Animated header for MD Audio VAE Tiled decoder</desc>
+<defs>
+  <filter id="f-glow" x="-60%" y="-400%" width="220%" height="900%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="4.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="f-line" x="-20%" y="-200%" width="140%" height="500%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="f-title" x="-8%" y="-50%" width="116%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/>
+    <feColorMatrix in="b" type="matrix"
+      values="0 0 0 0 0  0 0.55 0.9 0 0  0 0 0 0 0  0 0 0 0.9 0" result="t"/>
+    <feMerge><feMergeNode in="t"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="f-scan" x="-200%" y="0" width="500%" height="100%">
+    <feGaussianBlur stdDeviation="2 0"/>
+  </filter>
+  <linearGradient id="g-bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#090e17"/><stop offset="100%" stop-color="#060a10"/>
+  </linearGradient>
+  <linearGradient id="g-scan" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.0"/>
+    <stop offset="25%" stop-color="#00c8ff" stop-opacity="0.5"/>
+    <stop offset="75%" stop-color="#00c8ff" stop-opacity="0.5"/>
+    <stop offset="100%" stop-color="#00c8ff" stop-opacity="0.0"/>
+  </linearGradient>
+  <linearGradient id="g-wave" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#00d8ff"/><stop offset="100%" stop-color="#4b8fe8"/>
+  </linearGradient>
+</defs>
+<style>
+@keyframes bgIn { from{opacity:0} to{opacity:1} }
+@keyframes scanSweep { 0%{transform:translateX(-8px);opacity:0} 4%{opacity:1} 96%{opacity:0.7} 100%{transform:translateX(698px);opacity:0} }
+@keyframes titleFlash { 0%{opacity:0;filter:blur(8px) brightness(5)} 20%{opacity:1;filter:blur(2px) brightness(3)} 55%{opacity:1;filter:blur(0.5px) brightness(1.4)} 100%{opacity:1;filter:blur(0) brightness(1)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideUpFade { from{opacity:0;transform:translateY(9px)} to{opacity:1;transform:translateY(0)} }
+@keyframes drawWave { to{stroke-dashoffset:0} }
+@keyframes tileReveal { from{opacity:0;transform:scaleY(0)} to{opacity:0.15;transform:scaleY(1)} }
+@keyframes blendPulse { 0%,100%{opacity:0.08} 50%{opacity:0.22} }
+
+#bg{animation:bgIn .25s ease 0s both}
+#scan{animation:scanSweep .75s cubic-bezier(.4,0,.6,1) .12s both}
+#title{animation:titleFlash .72s cubic-bezier(.16,1,.3,1) .38s both;opacity:0}
+#sub{animation:fadeIn .55s ease 1.02s both;opacity:0}
+#grid{animation:fadeIn .45s ease .88s both;opacity:0}
+
+.tile{transform-origin:bottom;animation:tileReveal .4s ease both}
+#t1{animation-delay:1.2s} #t2{animation-delay:1.3s} #t3{animation-delay:1.4s}
+#t4{animation-delay:1.5s} #t5{animation-delay:1.6s} #t6{animation-delay:1.7s}
+#t7{animation-delay:1.8s} #t8{animation-delay:1.9s}
+
+.blend{animation:blendPulse 3s ease-in-out 3s infinite}
+
+#wave-glow{stroke-dasharray:800;stroke-dashoffset:800;animation:drawWave 1.2s cubic-bezier(.16,1,.3,1) 1.4s forwards}
+#wave-main{stroke-dasharray:800;stroke-dashoffset:800;animation:drawWave 1.2s cubic-bezier(.16,1,.3,1) 1.4s forwards}
+
+#lbl-tiles{animation:fadeIn .38s ease 2.1s both;opacity:0}
+#lbl-blend{animation:fadeIn .38s ease 2.2s both;opacity:0}
+#divider{animation:fadeIn .3s ease 2.4s both;opacity:0}
+
+#b1{animation:slideUpFade .32s cubic-bezier(.16,1,.3,1) 2.5s both;opacity:0}
+#b2{animation:slideUpFade .32s cubic-bezier(.16,1,.3,1) 2.61s both;opacity:0}
+#b3{animation:slideUpFade .32s cubic-bezier(.16,1,.3,1) 2.72s both;opacity:0}
+#b4{animation:slideUpFade .32s cubic-bezier(.16,1,.3,1) 2.83s both;opacity:0}
+#b5{animation:slideUpFade .32s cubic-bezier(.16,1,.3,1) 2.94s both;opacity:0}
+#b6{animation:slideUpFade .32s cubic-bezier(.16,1,.3,1) 3.05s both;opacity:0}
+#b7{animation:slideUpFade .32s cubic-bezier(.16,1,.3,1) 3.16s both;opacity:0}
+#tagline{animation:fadeIn .55s ease 3.3s both;opacity:0}
+</style>
+
+<rect id="bg" width="690" height="350" fill="url(#g-bg)"/>
+<rect id="scan" x="0" y="0" width="5" height="350" fill="url(#g-scan)" filter="url(#f-scan)"/>
+
+<!-- Grid -->
+<g id="grid">
+  <line x1="50" y1="228" x2="640" y2="228" stroke="#253545" stroke-width="0.9"/>
+  <line x1="50" y1="60" x2="50" y2="228" stroke="#253545" stroke-width="0.9"/>
+</g>
+
+<!-- Tile blocks -->
+<rect id="t1" class="tile" x="55" y="90" width="68" height="138" rx="2" fill="#00c8ff" opacity="0"/>
+<rect id="t2" class="tile" x="128" y="90" width="68" height="138" rx="2" fill="#00c8ff" opacity="0"/>
+<rect id="t3" class="tile" x="201" y="90" width="68" height="138" rx="2" fill="#00c8ff" opacity="0"/>
+<rect id="t4" class="tile" x="274" y="90" width="68" height="138" rx="2" fill="#00c8ff" opacity="0"/>
+<rect id="t5" class="tile" x="347" y="90" width="68" height="138" rx="2" fill="#00c8ff" opacity="0"/>
+<rect id="t6" class="tile" x="420" y="90" width="68" height="138" rx="2" fill="#00c8ff" opacity="0"/>
+<rect id="t7" class="tile" x="493" y="90" width="68" height="138" rx="2" fill="#00c8ff" opacity="0"/>
+<rect id="t8" class="tile" x="566" y="90" width="68" height="138" rx="2" fill="#00c8ff" opacity="0"/>
+
+<!-- Blend overlap zones -->
+<rect class="blend" x="119" y="90" width="18" height="138" rx="1" fill="#00ffcc" opacity="0"/>
+<rect class="blend" x="192" y="90" width="18" height="138" rx="1" fill="#00ffcc" opacity="0"/>
+<rect class="blend" x="265" y="90" width="18" height="138" rx="1" fill="#00ffcc" opacity="0"/>
+<rect class="blend" x="338" y="90" width="18" height="138" rx="1" fill="#00ffcc" opacity="0"/>
+<rect class="blend" x="411" y="90" width="18" height="138" rx="1" fill="#00ffcc" opacity="0"/>
+<rect class="blend" x="484" y="90" width="18" height="138" rx="1" fill="#00ffcc" opacity="0"/>
+<rect class="blend" x="557" y="90" width="18" height="138" rx="1" fill="#00ffcc" opacity="0"/>
+
+<!-- Reconstructed waveform -->
+<path id="wave-glow" d="M 55,160 Q 90,120 128,155 T 201,148 T 274,162 T 347,142 T 420,158 T 493,145 T 566,160 T 634,152" fill="none" stroke="#00c8ff" stroke-width="8" stroke-linecap="round" filter="url(#f-glow)"/>
+<path id="wave-main" d="M 55,160 Q 90,120 128,155 T 201,148 T 274,162 T 347,142 T 420,158 T 493,145 T 566,160 T 634,152" fill="none" stroke="url(#g-wave)" stroke-width="2.2" stroke-linecap="round" filter="url(#f-line)"/>
+
+<!-- Labels -->
+<g id="lbl-tiles">
+  <rect x="56" y="62" width="120" height="22" rx="3" fill="#060b14" fill-opacity="0.85"/>
+  <text x="62" y="78" font-family="monospace" font-size="10" font-weight="600" fill="#00c8ff">BPM-synced tiles</text>
+</g>
+<g id="lbl-blend">
+  <rect x="440" y="62" width="130" height="22" rx="3" fill="#060b14" fill-opacity="0.85"/>
+  <text x="446" y="78" font-family="monospace" font-size="10" font-weight="600" fill="#00ffcc">cosine blend zones</text>
+</g>
+
+<!-- Title -->
+<text id="title" x="340" y="32" text-anchor="middle" font-family="monospace" font-size="36" font-weight="700" fill="#d8e8f2" filter="url(#f-title)">MD Audio VAE Tiled</text>
+<text id="sub" x="340" y="49" text-anchor="middle" font-family="monospace" font-size="11" fill="#3b7fd4" letter-spacing="0.02em">v3.0.1  &#xB7;  Long-Audio VAE Decoder  &#xB7;  Seam-Free  &#xB7;  OOM-Safe</text>
+
+<!-- Footer -->
+<line id="divider" x1="40" y1="270" x2="650" y2="270" stroke="#1a2b3a" stroke-width="1"/>
+
+<g font-family="monospace" font-size="9" fill="#6a8a9a">
+  <g id="b1"><rect x="37" y="280" width="96" height="18" rx="3" fill="#0b1520"/><text x="85" y="293" text-anchor="middle">BPM-synced tiling</text></g>
+  <g id="b2"><rect x="139" y="280" width="78" height="18" rx="3" fill="#0b1520"/><text x="178" y="293" text-anchor="middle">cosine blend</text></g>
+  <g id="b3"><rect x="223" y="280" width="100" height="18" rx="3" fill="#0b1520"/><text x="273" y="293" text-anchor="middle">dual-pass spectral</text></g>
+  <g id="b4"><rect x="329" y="280" width="44" height="18" rx="3" fill="#0b1520"/><text x="351" y="293" text-anchor="middle">PLGR</text></g>
+  <g id="b5"><rect x="379" y="280" width="44" height="18" rx="3" fill="#0b1520"/><text x="401" y="293" text-anchor="middle">CASR</text></g>
+  <g id="b6"><rect x="429" y="280" width="44" height="18" rx="3" fill="#0b1520"/><text x="451" y="293" text-anchor="middle">GPL v3</text></g>
+  <g id="b7"><rect x="479" y="280" width="94" height="18" rx="3" fill="#0b1520"/><text x="526" y="293" text-anchor="middle">MDMAchine &#xB7; 2026</text></g>
+</g>
+
+<text id="tagline" x="340" y="325" text-anchor="middle" font-family="monospace" font-size="10" fill="#283c4c">long-audio VAE decoder &#xB7; BPM-synced tiling &#xB7; seam-free &#xB7; OOM-safe &#xB7; A&amp;E Concepts 2026</text>
+</svg>

@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ComfyUI output
+output/
+*.png
+*.wav
+
+# Archives
+*.rar
+*.zip
+*.7z
+*.tar.gz
+
+# Backup folder
+bak/
+
+# Internal / private docs
+*_Internal_Reference*.md
+*_REPO_INVENTORY.md
+*_PROJECT_INSTRUCTIONS*.md
+[redacted].py
+omni_scan_root.py
+root_snapshot.txt
+
+# Utility scripts
+scan_repo.py
