@@ -229,7 +229,7 @@ MD-Audio-VAE-Tiled/
 |   +-- md_audio_tiled.lua               V1 plugin adapter (minimal UI)
 |   +-- md_audio_tiled_V2.lua            V2 plugin adapter (extended params UI)
 +-- docs/
-    +-- WhitePaper.md                    Technical white paper
+    +-- VAE_Tiled_Audio_Decoder_White_Paper_v3_1.md  Technical white paper
 ```
 
 ---
@@ -253,7 +253,7 @@ Commercial closed-source integration requires a dual-license commercial exemptio
 
 Full technical treatment of the tiling architecture, seam repair subsystems, hum artifact characterization, and regrind program:
 
-[`docs/WhitePaper.md`](docs/WhitePaper.md)
+[`docs/VAE_Tiled_Audio_Decoder_White_Paper_v3_1.md`](docs/VAE_Tiled_Audio_Decoder_White_Paper_v3_1.md)
 
 arXiv pre-print -- **Coming Soon!**
 
