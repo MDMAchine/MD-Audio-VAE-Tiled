@@ -1,9 +1,9 @@
 # MD Audio VAE Tiled Decoder
-## Technical White Paper — v3.0.1
+## Technical White Paper — v3.1.0
 
 **Author:** Alexander Allan (MDMAchine) | A&E Concepts
 **Date:** 2026-06-02
-**Version:** 3.0.1
+**Version:** 3.1.0
 **License:** GPL v3
 **Target:** ACE-Step / Oobleck VAE
 
@@ -276,11 +276,11 @@ VAE Regrind V7 targets the Oobleck decoder weights directly. The regrind fine-tu
 
 **Results:**
 - Validation loss: 0.0506 (baseline 0.0593), -14.7% improvement
-- L_hum at crystallization: 0.0000
+- L_hum at convergence: 0.0000
 - VRAM: 2.44GB (fits on most consumer cards alongside inference)
-- Crystallized at epoch 15 (CX exit: mean-based variance < 0.0001 over minimum 15 epochs)
+- Converged at epoch 15 (mean-based variance stopping criterion, threshold < 0.0001, minimum 15 epochs)
 
-The CX (crystallization exit) logic in V7 was corrected from V6. V6 used last-value-based variance with a threshold of 0.001, which fired too loose at E10. V7 uses mean-based variance with threshold 0.0001 and minimum epoch 15.
+The convergence-detection logic in V7 was corrected from V6. V6 used a last-value-based variance check with threshold 0.001, which triggered prematurely at epoch 10. V7 uses mean-based variance with threshold 0.0001 and a minimum of 15 epochs.
 
 **Public release:** `acestep_1.5_vae_Regrind_V7.safetensors` on HuggingFace (`mdmachine/ACEStep-XL-Regrind-V1`).
 
@@ -296,7 +296,7 @@ V8 targets stronger hum suppression through architectural improvements to the tr
 
 **DJ set dataset (Omni_Manifold_DJSet_V1):** 3076 hours, average 14-minute tracks, bass-forward electronic music. Both provides long sequences and ensures the bass-heavy content that excites the artifact harmonics is well-represented.
 
-**Tightened CX:** threshold 0.00005 (was 0.0001), min_epoch 20 (was 15).
+**Tightened convergence criterion:** threshold 0.00005 (was 0.0001), minimum epoch 20 (was 15).
 
 Target GPU: RTX 5060 Ti (GPU1), 2.4GB footprint, simultaneous with Layer Regrind V8 on GPU0.
 
@@ -308,6 +308,7 @@ Target GPU: RTX 5060 Ti (GPU1), 2.4GB footprint, simultaneous with Layer Regrind
 
 Layer Regrind V7 targets the DiT-side resonance accumulation by fine-tuning the FFN (feed-forward network) layers of the ACE-Step XL transformer with a LoRA adapter.
 
+**Training:** Layers 24-31 FFN-only LoRA. Ran to a fixed 80-epoch ceiling (min_loss=0.4492) — the convergence criterion never triggered due to an oscillation bug in the internal stability metric used for early stopping (values alternated between two degenerate states, neither of which registered as stable).
 
 **Baked base:** The LoRA adapter was baked into xl-turbo-official via the formula:
 ```
@@ -326,6 +327,7 @@ Output: `acestep_xl_Regrind_V1.safetensors` (~8.6GB full base model).
 
 **L_res temporal accumulation loss:** New loss term penalizing positive spectral energy slope at artifact bands over time. V7 only penalized static hum amplitude; V8 penalizes the temporal growth of resonance that produces the 60-second accumulation effect.
 
+**Stability-metric fix:** The degenerate zone includes both a near-zero value and values approaching the metric's upper bound, which oscillate back to near-zero on the next step. V8 patches the stopping criterion to treat both degenerate states as non-converged.
 
 Target GPU: RTX 4070 Ti Super (GPU0), simultaneous with VAE Regrind V8.
 
@@ -401,6 +403,7 @@ All three targets implement the same algorithms for the non-STFT subsystems. Key
 |---|---|
 | DiT body resonance 60s+ | PARTIAL FIX — V8 layer regrind with L_res loss and 90s training clips pending |
 | VAE decoder static hum | PARTIAL FIX — V8 VAE regrind with adversarial injection pending |
+| Stability-metric streak oscillation | PRE-REGISTERED — V8 patches the stopping criterion to handle both degenerate oscillation states |
 | BIO punch collapse on dense complex | PENDING — collapse_temperature tuning (0.10-0.15 test) |
 | STFT ops in Lua/C++ | BY DESIGN — no native STFT library in target environment |
 | LSP bridge injection | DISABLED — Oobleck causal sensitivity to latent direction changes |
@@ -446,6 +449,6 @@ LSS_VARIANCE_THRESHOLD     = 0.12    # Gold standard
 
 ---
 
-*MD Audio VAE Tiled Decoder — Technical White Paper v3.0.1*
+*MD Audio VAE Tiled Decoder — Technical White Paper v3.1.0*
 *© 2026 Alexander Allan (MDMAchine) | A&E Concepts | GPL v3*
 *2026-06-02*
