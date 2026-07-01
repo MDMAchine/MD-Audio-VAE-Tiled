@@ -1,11 +1,19 @@
 # MD Audio VAE Tiled Decoder
-## Technical White Paper — v3.1.0
+## Technical White Paper for the Oobleck Causal VAE Chunked-Decode Artifact Problem
 
-**Author:** Alexander Allan (MDMAchine) | A&E Concepts
-**Date:** 2026-06-02
-**Version:** 3.1.0
-**License:** GPL v3
-**Target:** ACE-Step / Oobleck VAE
+**Alexander Allan (MDMAchine)**  
+A&E Concepts, New Bedford MA  
+
+**Version:** v3.2, Pre-print  
+**Date:** July 2026  
+**arXiv target:** cs.SD (Sound), cross-list eess.AS  
+**Supersedes:** v3.1.0, v3.0.0, v2.1.1, v2.0.x
+
+*IP Notice: This paper describes MD Audio VAE Tiled, released under GPL v3, and the
+VAE Regrind / Layer Regrind training program used to bake artifact suppression into
+model weights. All mathematics and implementation details in this paper are clean-room
+and intended for public distribution. © 2026 Alexander Allan / A&E Concepts. All rights
+reserved.*
 
 ---
 
@@ -27,14 +35,14 @@ The ACE-Step audio pipeline uses the Oobleck VAE, an autoencoder with an upscale
 
 **Memory constraint:** Decoding 1500 latent frames in a single forward pass requires memory proportional to the full sequence. On consumer GPUs, the practical limit is roughly 150-200 frames before OOM (Out of Memory) errors occur.
 
-**Cold-start constraint:** The Oobleck decoder requires a warm-up period. On a cold start (no prior context), the first 50-100 frames of decoded output are corrupted — the decoder's recurrent state has not stabilized. Naive chunked decoding without a context prefix produces a distinctive click/silence at the start of every chunk.
+**Cold-start constraint:** The Oobleck decoder requires a warm-up period. On a cold start (no prior context), the first 50-100 frames of decoded output are corrupted, the decoder's recurrent state has not stabilized. Naive chunked decoding without a context prefix produces a distinctive click/silence at the start of every chunk.
 
 ### 1.2 Native Decoder Artifacts
 
 Beyond chunking artifacts, the Oobleck VAE decoder produces a static harmonic artifact at specific frequencies that is present in all generations regardless of track length or content. This artifact has two components with separate origins (detailed in §4):
 
 - **VAE decoder bias:** Reconstruction bias baked into the Oobleck decoder weights. Static hum present in all generations. Manifests as a harmonic series centered on 654Hz (primary), 211Hz, 1090Hz, and sub fundamentals at 74Hz and 94Hz.
-- **DiT body resonance:** ODE manifold shearing in the early denoising steps of the diffusion process. Builds over 60+ seconds of generation. Not a VAE artifact — originates in the DiT transformer layers.
+- **DiT body resonance:** ODE manifold shearing in the early denoising steps of the diffusion process. Builds over 60+ seconds of generation. Not a VAE artifact, originates in the DiT transformer layers.
 
 ---
 
@@ -59,7 +67,7 @@ A critical implementation detail: every tile's write position in the output buff
 out_start = int(round(start * upscale_factor))
 ```
 
-Each tile independently anchors to its own latent start position. This produces a maximum positional error of 0.5 samples per seam — completely inaudible — and critically, does not accumulate across tiles.
+Each tile independently anchors to its own latent start position. This produces a maximum positional error of 0.5 samples per seam, completely inaudible, and critically, does not accumulate across tiles.
 
 The alternative, a write-cursor accumulator (`write_cursor += tile_samples - overlap_samples`), was used in v2.0.x and was removed in v2.1.0. The accumulator propagates VAE rounding slop forward across tiles. By tile 9 on a long track, the write cursor can be 20-30 samples off from the correct position, which manifests as snare timing drift and subtle pitch-shifting on pitched elements.
 
@@ -95,11 +103,11 @@ Standard single-pass tiling places seams at a fixed grid. Dual-pass staggers a s
 Both passes run through `_execute_single_pass` independently, producing two full-length audio buffers. The merge uses trapezoidal weight maps:
 
 ```
-weight[i] = trapezoidal ramp — flat 1.0 at center, ramps to 0.5 at tile edges
+weight[i] = trapezoidal ramp, flat 1.0 at center, ramps to 0.5 at tile edges
 merged = audio_a * (weight_a / total) + audio_b * (weight_b / total)
 ```
 
-Pass A seam positions become weight-valley positions — regions where Pass B's weight is maximal. The result is that neither pass dominates at its own seam positions, and both seams cancel against each other's clean centers.
+Pass A seam positions become weight-valley positions, regions where Pass B's weight is maximal. The result is that neither pass dominates at its own seam positions, and both seams cancel against each other's clean centers.
 
 ### 3.2 Phase-Coherent Triple-Pass (PCT)
 
@@ -111,9 +119,9 @@ PCT is disabled by default (`PCT_TRIPLE_PASS = False`) due to the 3x decode time
 
 ### 3.3 Context-Aware Seam Repair (CASR)
 
-CASR replaced the old SLERP bridge micro-decode in v2.1.0. The original approach decoded 8-frame micro-windows at each seam boundary and spliced the result. This failed with Oobleck because the decoder requires at least 50-100 frame warm-up — an 8-frame cold decode produces silence or garbage on frames 0-6 and a click on frame 7 when the state partially stabilizes.
+CASR replaced the old SLERP bridge micro-decode in v2.1.0. The original approach decoded 8-frame micro-windows at each seam boundary and spliced the result. This failed with Oobleck because the decoder requires at least 50-100 frame warm-up, an 8-frame cold decode produces silence or garbage on frames 0-6 and a click on frame 7 when the state partially stabilizes.
 
-CASR instead decodes a full-context window centered on each seam boundary — the same window size used in the main decode loop. It extracts only the seam-adjacent patch (frames within `CONST_CASR_PATCH_FRAMES` of center), then applies a symmetric cosine bell:
+CASR instead decodes a full-context window centered on each seam boundary, the same window size used in the main decode loop. It extracts only the seam-adjacent patch (frames within `CONST_CASR_PATCH_FRAMES` of center), then applies a symmetric cosine bell:
 
 ```
 bell = [fade_up | fade_down]  # 0 at both edges, 1 at center
@@ -163,7 +171,7 @@ The artifact manifests as a harmonic series:
 | 74.4 Hz | -1.43 dB, Q=6.27 | Sub fundamental, BPM-dependent |
 | 94.0 Hz | -1.86 dB, Q=7.08 | Upper sub, BPM-dependent |
 | 211 Hz | ~-7 dB | 3rd harmonic of fundamental |
-| 654–669 Hz | -12 to -15 dB | Primary hum — most perceptible |
+| 654–669 Hz | -12 to -15 dB | Primary hum, most perceptible |
 | 1090 Hz | ~-7 dB | 5th harmonic |
 
 The primary hum at ~654Hz exhibits a BPM-dependent frequency shift of approximately 2Hz per doubling of BPM. At 88 BPM the fundamental sits at ~75Hz; at 172 BPM it shifts to ~77Hz. This tempo-locking behavior implicates the decoder's temporal processing in the artifact generation mechanism.
@@ -186,7 +194,7 @@ Both components must be targeted independently for full suppression. The VAE-sid
 
 ### 5.1 Mechanism
 
-The Oobleck encoder produces a 64-channel latent representation. The channels are not equally informative — some carry genuine content variation, others carry persistent low-variance bias with mean offsets (DC components) that the decoder reconstructs as static spectral artifacts.
+The Oobleck encoder produces a 64-channel latent representation. The channels are not equally informative, some carry genuine content variation, others carry persistent low-variance bias with mean offsets (DC components) that the decoder reconstructs as static spectral artifacts.
 
 LSS operates on the latent before decode, computing per-channel variance across time:
 
@@ -204,9 +212,9 @@ gain[c] = smooth if var_norm[c] < var_threshold else 1.0
 
 At `strength=0.25` and `var_threshold=0.12`, low-variance channels are suppressed to at minimum 75% of their original amplitude, with linear recovery toward full amplitude as variance approaches the threshold. High-variance channels are untouched.
 
-### 5.2 DC Removal — Permanently Disabled
+### 5.2 DC Removal, Permanently Disabled
 
-The LSS includes a DC removal option (`lss_dc_remove`) that subtracts the per-channel temporal mean before suppression. This was found to cause metallic distortion — the DC offset removal disrupts temporal dependencies in the latent that the decoder relies on for frequency stability. `lss_dc_remove` is permanently disabled. The gain-based suppression alone is sufficient and produces no audible distortion at the gold standard settings.
+The LSS includes a DC removal option (`lss_dc_remove`) that subtracts the per-channel temporal mean before suppression. This was found to cause metallic distortion, the DC offset removal disrupts temporal dependencies in the latent that the decoder relies on for frequency stability. `lss_dc_remove` is permanently disabled. The gain-based suppression alone is sufficient and produces no audible distortion at the gold standard settings.
 
 ---
 
@@ -234,7 +242,7 @@ gain[f, t] = signal_est[f, t] / (signal_est[f, t] + noise_est[f])
   where signal_est = (mag_sq - noise_est).clamp(min=0)
 ```
 
-The gain mask is smoothed along the frequency axis via `conv1d` with a kernel width corresponding to `smooth_hz=80Hz` in frequency resolution. This prevents per-bin gain variation that creates "musical noise" — the buzzing artifact that results from unstable per-bin modulation.
+The gain mask is smoothed along the frequency axis via `conv1d` with a kernel width corresponding to `smooth_hz=80Hz` in frequency resolution. This prevents per-bin gain variation that creates "musical noise", the buzzing artifact that results from unstable per-bin modulation.
 
 `min_gain=0.15` ensures no frequency bin is ever fully silenced. Full suppression of low-gain bins creates musical noise in sparse audio regions. The 0.15 floor leaves a trace of the noise floor in the output, which is perceptually preferable to the buzzing alternative.
 
@@ -253,16 +261,16 @@ except ImportError:
         import torchaudio.functional as TAF
         # GPU-accelerated path
     except:
-        # Python loop — correct but slow
+        # Python loop, correct but slow
 ```
 
 Install scipy for production use.
 
-### 6.4 PLGR — Psychoacoustic Loudness-Aware Gain Riding
+### 6.4 PLGR, Psychoacoustic Loudness-Aware Gain Riding
 
-Standard RMS gain riding corrects inter-tile level differences by chasing the previous tile's RMS energy. This works for spectrally consistent content but fails when bass-heavy tiles alternate with sparse tiles — a kick-heavy tile reads as loud relative to a breakdown tile and over-amplifies it, causing pumping.
+Standard RMS gain riding corrects inter-tile level differences by chasing the previous tile's RMS energy. This works for spectrally consistent content but fails when bass-heavy tiles alternate with sparse tiles, a kick-heavy tile reads as loud relative to a breakdown tile and over-amplifies it, causing pumping.
 
-PLGR uses ITU-R BS.1770-4 K-weighted momentary loudness (LUFS) instead of RMS. The K-weighting filters (pre-filter high-shelf + HPF stage) approximate the equal-loudness contours of human hearing, de-emphasizing bass energy relative to mid-high energy. This makes the loudness measurement perceptually accurate — a bass-heavy tile no longer reads as disproportionately loud.
+PLGR uses ITU-R BS.1770-4 K-weighted momentary loudness (LUFS) instead of RMS. The K-weighting filters (pre-filter high-shelf + HPF stage) approximate the equal-loudness contours of human hearing, de-emphasizing bass energy relative to mid-high energy. This makes the loudness measurement perceptually accurate, a bass-heavy tile no longer reads as disproportionately loud.
 
 PLGR is downward-only: it attenuates tiles that are louder than the previous tile, but never amplifies quiet tiles. Maximum correction is -1.5dB per tile. This prevents quiet breakdown sections from being boosted, preserving genuine dynamics while correcting tile-to-tile level inconsistency.
 
@@ -270,7 +278,7 @@ PLGR is downward-only: it attenuates tiles that are louder than the previous til
 
 ## 7. VAE Regrind Program
 
-### 7.1 V7 — Deployed
+### 7.1 V7, Deployed
 
 VAE Regrind V7 targets the Oobleck decoder weights directly. The regrind fine-tunes the decoder on a reconstruction loss that includes a hum-penalty component `L_hum` targeting the measured artifact frequencies.
 
@@ -284,13 +292,13 @@ The convergence-detection logic in V7 was corrected from V6. V6 used a last-valu
 
 **Public release:** `acestep_1.5_vae_Regrind_V7.safetensors` on HuggingFace (`mdmachine/ACEStep-XL-Regrind-V1`).
 
-### 7.2 V8 — Pre-Registered
+### 7.2 V8, Pre-Registered
 
 V8 targets stronger hum suppression through architectural improvements to the training setup:
 
 **Adversarial hum injection:** Synthetic artifact frequencies injected at -25dB during training (30% probability). Forces the decoder to actively learn hum suppression rather than passively avoid hum-generating activations.
 
-**Frequency-sweep validation set:** 75 pure tones at 60-800Hz in 10Hz steps, 30 seconds each. This provides an honest benchmark that cannot hide behind mix reconstruction quality — a model that suppresses hum only in complex content will fail on pure tones.
+**Frequency-sweep validation set:** 75 pure tones at 60-800Hz in 10Hz steps, 30 seconds each. This provides an honest benchmark that cannot hide behind mix reconstruction quality, a model that suppresses hum only in complex content will fail on pure tones.
 
 **90-second training clips:** V7 used 8-second clips, which are too short to observe the accumulation behavior of the DiT body resonance. 90-second clips expose the temporal build-up within the training window.
 
@@ -304,11 +312,11 @@ Target GPU: RTX 5060 Ti (GPU1), 2.4GB footprint, simultaneous with Layer Regrind
 
 ## 8. Layer Regrind Program
 
-### 8.1 V7 — Deployed and Baked
+### 8.1 V7, Deployed and Baked
 
 Layer Regrind V7 targets the DiT-side resonance accumulation by fine-tuning the FFN (feed-forward network) layers of the ACE-Step XL transformer with a LoRA adapter.
 
-**Training:** Layers 24-31 FFN-only LoRA. Ran to a fixed 80-epoch ceiling (min_loss=0.4492) — the convergence criterion never triggered due to an oscillation bug in the internal stability metric used for early stopping (values alternated between two degenerate states, neither of which registered as stable).
+**Training:** Layers 24-31 FFN-only LoRA. Ran to a fixed 80-epoch ceiling (min_loss=0.4492), the convergence criterion never triggered due to an oscillation bug in the internal stability metric used for early stopping (values alternated between two degenerate states, neither of which registered as stable).
 
 **Baked base:** The LoRA adapter was baked into xl-turbo-official via the formula:
 ```
@@ -321,7 +329,7 @@ Output: `acestep_xl_Regrind_V1.safetensors` (~8.6GB full base model).
 
 **Perceptual result:** Resonance reduced but not eliminated. V7 is a baseline, not a ceiling. V8 required for stronger suppression.
 
-### 8.2 V8 — Pre-Registered
+### 8.2 V8, Pre-Registered
 
 **Extended layer window:** Layers 20-31 (12 layers, ~2.9% of parameters vs V7's 8 layers at 1.9%).
 
@@ -347,8 +355,8 @@ Comparative measurements of BIO and STORM samplers under observer analysis (2026
 | HF Air | -15% | -15% | +12 to +13% | +12 to +13% |
 
 Key observations:
-- BIO dominates coherence and flatness at high BPM — better phase integrity in the decoded audio.
-- BIO punch collapses on dense complex material (branch collapse hypothesis — dense content causes BIO's branching strategy to degenerate).
+- BIO dominates coherence and flatness at high BPM, better phase integrity in the decoded audio.
+- BIO punch collapses on dense complex material (branch collapse hypothesis, dense content causes BIO's branching strategy to degenerate).
 - The HF air flip (+13% on dense vs -15% on sparse) is content-dependent, not a processing bug. HF correction at the node level was disabled for this reason.
 - Flatness and coherence degradation at high BPM is traced to VAE tiled seaming, not regrind quality.
 
@@ -364,7 +372,7 @@ Air reduction of -17.02% to -17.03% was measured identically across ACE-Step 2.6
 
 The Python implementation consists of two files: the core math engine (`md_audio_tiled_core.py`) and the ComfyUI node wrapper (`MD_Audio_VAE_Tiled.py`). The wrapper loads the core via a Universal Binary Loader that tries a compiled binary (`md_audio_tiled_core_bin`) first, falls back to source. All runtime parameters are passed via a YAML string input, with a complete set of defaults in `_VAE_YAML_DEFAULTS`. The wrapper outputs the active parameter set as a `yaml_applied` string for reproducibility.
 
-The API client path (`AudioTiledApiClient`) dispatches decoding to a remote server. Serialization uses `torch.save` to `BytesIO` with base64+zlib encoding. The `pickle` module is not used — this was a security fix in v2.1.1 that eliminated a remote code execution surface on API response deserialization.
+The API client path (`AudioTiledApiClient`) dispatches decoding to a remote server. Serialization uses `torch.save` to `BytesIO` with base64+zlib encoding. The `pickle` module is not used, this was a security fix in v2.1.1 that eliminated a remote code execution surface on API response deserialization.
 
 ### 10.2 HOT-Step-CPP Target
 
@@ -401,16 +409,16 @@ All three targets implement the same algorithms for the non-STFT subsystems. Key
 
 | Issue | Status |
 |---|---|
-| DiT body resonance 60s+ | PARTIAL FIX — V8 layer regrind with L_res loss and 90s training clips pending |
-| VAE decoder static hum | PARTIAL FIX — V8 VAE regrind with adversarial injection pending |
-| Stability-metric streak oscillation | PRE-REGISTERED — V8 patches the stopping criterion to handle both degenerate oscillation states |
-| BIO punch collapse on dense complex | PENDING — collapse_temperature tuning (0.10-0.15 test) |
-| STFT ops in Lua/C++ | BY DESIGN — no native STFT library in target environment |
-| LSP bridge injection | DISABLED — Oobleck causal sensitivity to latent direction changes |
+| DiT body resonance 60s+ | PARTIAL FIX, V8 layer regrind with L_res loss and 90s training clips pending |
+| VAE decoder static hum | PARTIAL FIX, V8 VAE regrind with adversarial injection pending |
+| Stability-metric streak oscillation | PRE-REGISTERED, V8 patches the stopping criterion to handle both degenerate oscillation states |
+| BIO punch collapse on dense complex | PENDING, collapse_temperature tuning (0.10-0.15 test) |
+| STFT ops in Lua/C++ | BY DESIGN, no native STFT library in target environment |
+| LSP bridge injection | DISABLED, Oobleck causal sensitivity to latent direction changes |
 
 ---
 
-## Appendix A — Hum Notch Biquad Parameters (Deployed)
+## Appendix A, Hum Notch Biquad Parameters (Deployed)
 
 ```
 Bass shelf:   120Hz, -2.0dB, slope=0.7
@@ -429,7 +437,7 @@ Boost bands (disabled by default, preserved for experimentation):
 
 ---
 
-## Appendix B — Core Constants
+## Appendix B, Core Constants
 
 ```python
 CONST_EPSILON              = 1e-8
@@ -447,8 +455,9 @@ LSS_STRENGTH               = 0.25    # Gold standard
 LSS_VARIANCE_THRESHOLD     = 0.12    # Gold standard
 ```
 
+
 ---
 
-*MD Audio VAE Tiled Decoder — Technical White Paper v3.1.0*
-*© 2026 Alexander Allan (MDMAchine) | A&E Concepts | GPL v3*
-*2026-06-02*
+*© 2026 Alexander Allan (MDMAchine) · A&E Concepts*  
+*GPL v3 · All Rights Reserved*  
+*Version 3.2, July 2026*

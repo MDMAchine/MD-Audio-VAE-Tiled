@@ -224,7 +224,7 @@ Install scipy. The Python loop fallback is orders of magnitude slower on long tr
 | `vae/MD_Audio_VAE_Tiled.py` | ComfyUI node wrapper, YAML config, BPM engine |
 | `hotstep/md_audio_tiled.lua` | V1 plugin adapter (minimal UI) |
 | `hotstep/md_audio_tiled_V2.lua` | V2 plugin adapter (extended params UI) |
-| `docs/VAE_Tiled_Audio_Decoder_White_Paper_v3_1.md` | Technical white paper |
+| `docs/MD_Audio_VAE_Tiled_White_Paper_v3_2.md` | Technical white paper |
 
 ---
 
@@ -247,7 +247,7 @@ Commercial closed-source integration requires a dual-license commercial exemptio
 
 Full technical treatment of the tiling architecture, seam repair subsystems, hum artifact characterization, and regrind program:
 
-[`docs/VAE_Tiled_Audio_Decoder_White_Paper_v3_1.md`](docs/VAE_Tiled_Audio_Decoder_White_Paper_v3_1.md)
+[`docs/MD_Audio_VAE_Tiled_White_Paper_v3_2.md`](docs/MD_Audio_VAE_Tiled_White_Paper_v3_2.md)
 
 ---
 
