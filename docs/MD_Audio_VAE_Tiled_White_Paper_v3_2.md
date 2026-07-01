@@ -343,24 +343,7 @@ Target GPU: RTX 4070 Ti Super (GPU0), simultaneous with VAE Regrind V8.
 
 ## 9. Observer Measurement Findings
 
-### 9.1 BIO vs STORM Sampler
-
-Comparative measurements of BIO and STORM samplers under observer analysis (2026-05-15):
-
-| Metric | STORM Simple | BIO Simple | STORM Complex/Fast | BIO Complex/Fast |
-|---|---|---|---|---|
-| Coherence | -1.4% | -0.0% | -16 to -19% | -5 to -17% |
-| Flatness | -2.9% | -0.1% | -51 to -73% | -24 to -40% |
-| Punch | -26% | -14% | -29 to -36% | -25 to -58% |
-| HF Air | -15% | -15% | +12 to +13% | +12 to +13% |
-
-Key observations:
-- BIO dominates coherence and flatness at high BPM, better phase integrity in the decoded audio.
-- BIO punch collapses on dense complex material (branch collapse hypothesis, dense content causes BIO's branching strategy to degenerate).
-- The HF air flip (+13% on dense vs -15% on sparse) is content-dependent, not a processing bug. HF correction at the node level was disabled for this reason.
-- Flatness and coherence degradation at high BPM is traced to VAE tiled seaming, not regrind quality.
-
-### 9.2 Model Size Independence
+### 9.1 Model Size Independence
 
 Air reduction of -17.02% to -17.03% was measured identically across ACE-Step 2.6B and XL models. This confirms the artifact is a VAE decoder characteristic, not dependent on DiT model size. The VAE decoder weights are the same across model variants.
 
@@ -412,7 +395,6 @@ All three targets implement the same algorithms for the non-STFT subsystems. Key
 | DiT body resonance 60s+ | PARTIAL FIX, V8 layer regrind with L_res loss and 90s training clips pending |
 | VAE decoder static hum | PARTIAL FIX, V8 VAE regrind with adversarial injection pending |
 | Stability-metric streak oscillation | PRE-REGISTERED, V8 patches the stopping criterion to handle both degenerate oscillation states |
-| BIO punch collapse on dense complex | PENDING, collapse_temperature tuning (0.10-0.15 test) |
 | STFT ops in Lua/C++ | BY DESIGN, no native STFT library in target environment |
 | LSP bridge injection | DISABLED, Oobleck causal sensitivity to latent direction changes |
 
@@ -455,6 +437,19 @@ LSS_STRENGTH               = 0.25    # Gold standard
 LSS_VARIANCE_THRESHOLD     = 0.12    # Gold standard
 ```
 
+## References
+
+1. Evans, Z., Carr, C. J., Taylor, J., Hawley, S. H., & Pons, J. (2024). Stable Audio Open. *arXiv:2407.14358*.
+
+2. ACE-Step: A Step Towards Music Generation Foundation Models. ByteDance Research, 2025.
+
+3. International Telecommunication Union. (2015). Algorithms to measure audio programme loudness and true-peak audio level. *Recommendation ITU-R BS.1770-4*.
+
+4. Allen, J. B. (1977). Short term spectral analysis, synthesis, and modification by discrete Fourier transform. *IEEE Transactions on Acoustics, Speech, and Signal Processing*, 25(3), 235-238.
+
+5. Scalart, P., & Filho, J. V. (1996). Speech enhancement based on a priori signal to noise estimation. *IEEE ICASSP 1996*.
+
+6. Allan, A. (MDMAchine). (2026). STORM: Stabilized Taylor Oscillation with Runge-Kutta Memory, An Adaptive Stiffness-Switching ODE Sampler for Flow-Matching Diffusion Models. *A&E Concepts preprint*.
 
 ---
 
