@@ -42,7 +42,7 @@ The ACE-Step audio pipeline uses the Oobleck VAE, an autoencoder with an upscale
 Beyond chunking artifacts, the Oobleck VAE decoder produces a static harmonic artifact at specific frequencies that is present in all generations regardless of track length or content. This artifact has two components with separate origins (detailed in §4):
 
 - **VAE decoder bias:** Reconstruction bias baked into the Oobleck decoder weights. Static hum present in all generations. Manifests as a harmonic series centered on 654Hz (primary), 211Hz, 1090Hz, and sub fundamentals at 74Hz and 94Hz.
-- **DiT body resonance:** ODE manifold shearing in the early denoising steps of the diffusion process. Builds over 60+ seconds of generation. Not a VAE artifact, originates in the DiT transformer layers.
+- **DiT body resonance:** Builds over 60+ seconds of generation. Not a VAE artifact, originates in the DiT transformer layers. Hypothesized to arise from ODE manifold shearing in the early denoising steps of the diffusion process (see §4 for full discussion — this is an inferred mechanism, not a confirmed one).
 
 ---
 
