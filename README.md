@@ -251,4 +251,4 @@ Full technical treatment of the tiling architecture, seam repair subsystems, hum
 
 ---
 
-*© 2026 Alexander Allan (MDMAchine) · A&E Concepts · Patent Pending*
+*© 2026 Alexander Allan (MDMAchine) · A&E Concepts*

@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "GPL-3.0-or-later" }
 authors = [
-    { name = "Alexander Allan (MDMAchine)", email = "aallan@aeconcepts.net" },
+    { name = "Alexander Allan (MDMAchine)" },
 ]
 keywords = ["diffusion", "comfyui", "audio", "ace-step", "vae", "oobleck", "tiling", "overlap-add"]
 classifiers = [
@@ -37,4 +37,4 @@ full = [
 [project.urls]
 Homepage = "https://github.com/MDMAchine/MD-Audio-VAE-Tiled"
 Issues = "https://github.com/MDMAchine/MD-Audio-VAE-Tiled/issues"
-HuggingFace = "https://huggingface.co/mdmachine/ACEStep-XL-Regrind-V1"
+HuggingFace = "https://huggingface.co/mdmachine/ACEStep-XL-Regrind-V1" 

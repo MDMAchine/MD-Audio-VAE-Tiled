@@ -27,14 +27,3 @@ output/
 
 # Backup folder
 bak/
-
-# Internal / private docs
-*_Internal_Reference*.md
-*_REPO_INVENTORY.md
-*_PROJECT_INSTRUCTIONS*.md
-[redacted].py
-omni_scan_root.py
-root_snapshot.txt
-
-# Utility scripts
-scan_repo.py
