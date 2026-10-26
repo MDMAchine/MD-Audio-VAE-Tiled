@@ -27,3 +27,20 @@ output/
 
 # Backup folder
 bak/
+
+# Internal paths (public-repo standard 2026-10-25)
+docs/internal/
+reports/
+**/reports/
+test_logs/
+**/test_logs/
+_tmp/
+**/_tmp/
+.env
+*.env
+.env.*
+*SIGNING*
+*signing_notes*
+*.pem
+*.key
+*.keystore
